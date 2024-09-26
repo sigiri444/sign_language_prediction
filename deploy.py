@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from streamlit_webrtc import webrtc_streamer,VideoProcessorBase
 import pickle
 import cv2
 import mediapipe as mp
@@ -26,8 +26,8 @@ st.image('asl.webp',caption='American Sign Language')
 st.markdown('NOTE: Use single hand to use ASL gesture')
 
 run = st.button('Run')
-class VideoTransformer(VideoTransformerBase):
-    def transform(self, frame):
+class VideoProcessor(VideoProcessorBase):
+    def recv(self, frame):
         img = frame.to_ndarray(format="bgr24")
         data_aux = []
         x_ = []
@@ -78,7 +78,7 @@ class VideoTransformer(VideoTransformerBase):
         return img
 
 if run:
-    webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
+    webrtc_streamer(key="example", video_transformer_factory=VideoProcessor)
 
 # FRAME_WINDOW = st.image([])
 
