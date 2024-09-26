@@ -84,4 +84,4 @@ while run:
     FRAME_WINDOW.image(frame)
 
 cap.release()
-cv2.destroyAllWindows()
+#cv2.destroyAllWindows()
