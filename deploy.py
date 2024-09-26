@@ -6,7 +6,7 @@ import mediapipe as mp
 import numpy as np
 
 # Load the model
-model_dict = pickle.load(open('model.p', 'rb'))
+model_dict = pickle.load(open('model1.p', 'rb'))
 model = model_dict['model']
 
 # Initialize MediaPipe Hands
