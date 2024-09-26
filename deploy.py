@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import pickle
 import cv2
 import mediapipe as mp
@@ -25,63 +26,116 @@ st.image('asl.webp',caption='American Sign Language')
 st.markdown('NOTE: Use single hand to use ASL gesture')
 
 run = st.button('Run')
+class VideoTransformer(VideoTransformerBase):
+    def transform(self, frame):
+        img = frame.to_ndarray(format="bgr24")
+        data_aux = []
+        x_ = []
+        y_ = []
 
-FRAME_WINDOW = st.image([])
+        H, W, _ = img.shape
 
-cap = cv2.VideoCapture(0)
+        frame_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-while run:
-    data_aux = []
-    x_ = []
-    y_ = []
+        results = hands.process(frame_rgb)
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                mp_drawing.draw_landmarks(
+                    img,  # image to draw
+                    hand_landmarks,  # model output
+                    mp_hands.HAND_CONNECTIONS,  # hand connections
+                    mp_drawing_styles.get_default_hand_landmarks_style(),
+                    mp_drawing_styles.get_default_hand_connections_style())
 
-    ret, frame = cap.read()
-    if not ret:
-        break
+            for hand_landmarks in results.multi_hand_landmarks:
+                for i in range(len(hand_landmarks.landmark)):
+                    x = hand_landmarks.landmark[i].x
+                    y = hand_landmarks.landmark[i].y
 
-    H, W, _ = frame.shape
+                    x_.append(x)
+                    y_.append(y)
 
-    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                for i in range(len(hand_landmarks.landmark)):
+                    x = hand_landmarks.landmark[i].x
+                    y = hand_landmarks.landmark[i].y
+                    data_aux.append(x - min(x_))
+                    data_aux.append(y - min(y_))
 
-    results = hands.process(frame_rgb)
-    if results.multi_hand_landmarks:
-        for hand_landmarks in results.multi_hand_landmarks:
-            mp_drawing.draw_landmarks(
-                frame,  # image to draw
-                hand_landmarks,  # model output
-                mp_hands.HAND_CONNECTIONS,  # hand connections
-                mp_drawing_styles.get_default_hand_landmarks_style(),
-                mp_drawing_styles.get_default_hand_connections_style())
+            x1 = int(min(x_) * W) - 10
+            y1 = int(min(y_) * H) - 10
 
-        for hand_landmarks in results.multi_hand_landmarks:
-            for i in range(len(hand_landmarks.landmark)):
-                x = hand_landmarks.landmark[i].x
-                y = hand_landmarks.landmark[i].y
+            x2 = int(max(x_) * W) - 10
+            y2 = int(max(y_) * H) - 10
 
-                x_.append(x)
-                y_.append(y)
+            prediction = model.predict([np.asarray(data_aux)])
 
-            for i in range(len(hand_landmarks.landmark)):
-                x = hand_landmarks.landmark[i].x
-                y = hand_landmarks.landmark[i].y
-                data_aux.append(x - min(x_))
-                data_aux.append(y - min(y_))
+            predicted_character = labels_dict[int(prediction[0])]
 
-        x1 = int(min(x_) * W) - 10
-        y1 = int(min(y_) * H) - 10
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 0), 4)
+            cv2.putText(img, predicted_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3,
+                        cv2.LINE_AA)
 
-        x2 = int(max(x_) * W) - 10
-        y2 = int(max(y_) * H) - 10
+        return img
 
-        prediction = model.predict([np.asarray(data_aux)])
+if run:
+    webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
 
-        predicted_character = labels_dict[int(prediction[0])]
+# FRAME_WINDOW = st.image([])
 
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)
-        cv2.putText(frame, predicted_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3,
-                    cv2.LINE_AA)
+# cap = cv2.VideoCapture(0)
 
-    FRAME_WINDOW.image(frame)
+# while run:
+#     data_aux = []
+#     x_ = []
+#     y_ = []
 
-cap.release()
-#cv2.destroyAllWindows()
+#     ret, frame = cap.read()
+#     if not ret:
+#         break
+
+#     H, W, _ = frame.shape
+
+#     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+#     results = hands.process(frame_rgb)
+#     if results.multi_hand_landmarks:
+#         for hand_landmarks in results.multi_hand_landmarks:
+#             mp_drawing.draw_landmarks(
+#                 frame,  # image to draw
+#                 hand_landmarks,  # model output
+#                 mp_hands.HAND_CONNECTIONS,  # hand connections
+#                 mp_drawing_styles.get_default_hand_landmarks_style(),
+#                 mp_drawing_styles.get_default_hand_connections_style())
+
+#         for hand_landmarks in results.multi_hand_landmarks:
+#             for i in range(len(hand_landmarks.landmark)):
+#                 x = hand_landmarks.landmark[i].x
+#                 y = hand_landmarks.landmark[i].y
+
+#                 x_.append(x)
+#                 y_.append(y)
+
+#             for i in range(len(hand_landmarks.landmark)):
+#                 x = hand_landmarks.landmark[i].x
+#                 y = hand_landmarks.landmark[i].y
+#                 data_aux.append(x - min(x_))
+#                 data_aux.append(y - min(y_))
+
+#         x1 = int(min(x_) * W) - 10
+#         y1 = int(min(y_) * H) - 10
+
+#         x2 = int(max(x_) * W) - 10
+#         y2 = int(max(y_) * H) - 10
+
+#         prediction = model.predict([np.asarray(data_aux)])
+
+#         predicted_character = labels_dict[int(prediction[0])]
+
+#         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)
+#         cv2.putText(frame, predicted_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3,
+#                     cv2.LINE_AA)
+
+#     FRAME_WINDOW.image(frame)
+
+# cap.release()
+# #cv2.destroyAllWindows()
