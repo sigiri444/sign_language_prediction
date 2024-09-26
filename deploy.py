@@ -78,7 +78,7 @@ class VideoProcessor(VideoProcessorBase):
         return img
 
 if run:
-    webrtc_streamer(key="example", video_transformer_factory=VideoProcessor)
+    webrtc_streamer(key="example", video_processor_factory=VideoProcessor)
 
 # FRAME_WINDOW = st.image([])
 
