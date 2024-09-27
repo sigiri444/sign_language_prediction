@@ -55,7 +55,7 @@ six==1.16.0
 smmap==5.0.1
 sounddevice==0.5.0
 streamlit==1.33.0
-streamlit-webrtc==0.6.3
+streamlit-webrtc
 tenacity==8.5.0
 threadpoolctl==3.5.0
 toml==0.10.2
