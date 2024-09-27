@@ -1,8 +1,6 @@
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, ClientSettings
 
-
-
 rtc_configuration = {
     "iceServers": [
         {"urls": ["stun:stun.l.google.com:19302"]},
@@ -18,37 +16,23 @@ media_stream_constraints = {
     "audio": False,
 }
 
-# WEBRTC_CLIENT_SETTINGS = ClientSettings(
-#     rtc_configuration={"iceServers": [
-#             {"urls": ["stun:stun.l.google.com:19302"]},
-#             {"urls": ["stun:stun1.l.google.com:19302"]},
-#             {"urls": ["stun:stun2.l.google.com:19302"]},
-#             {"urls": ["stun:stun3.l.google.com:19302"]},
-#             {"urls": ["stun:stun4.l.google.com:19302"]}
-#         ]
-#     },
-#     media_stream_constraints={
-#         "video": True,
-#         "audio": False,
-#     },
-# )
-class VideoProcessor(VideoProcessorBase):
-    def __init__(self):
-        self.hands = mp.solutions.hands.Hands(static_image_mode=False, min_detection_confidence=0.3)
-
-    def recv(self, frame):
-        print("Frame received")
-        img = frame.to_ndarray(format="bgr24")
-        print("Frame shape:", img.shape)
-        # Rest of your code...
-        return img
-
-    def __del__(self):
-        self.hands.close()
-
 # class VideoProcessor(VideoProcessorBase):
+#     def __init__(self):
+#         self.hands = mp.solutions.hands.Hands(static_image_mode=False, min_detection_confidence=0.3)
+
 #     def recv(self, frame):
-#         return frame
+#         print("Frame received")
+#         img = frame.to_ndarray(format="bgr24")
+#         print("Frame shape:", img.shape)
+#         # Rest of your code...
+#         return img
+
+#     def __del__(self):
+#         self.hands.close()
+
+class VideoProcessor(VideoProcessorBase):
+    def recv(self, frame):
+        return frame
 
 st.title("WebRTC Test")
 webrtc_streamer(key="example", rtc_configuration=rtc_configuration, media_stream_constraints=media_stream_constraints,
