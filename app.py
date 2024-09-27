@@ -3,7 +3,14 @@ from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, ClientSettings
 
 
 WEBRTC_CLIENT_SETTINGS = ClientSettings(
-    rtc_configuration={"iceServers":get_ice_servers()},
+    rtc_configuration={"iceServers": [
+            {"urls": ["stun:stun.l.google.com:19302"]},
+            {"urls": ["stun:stun1.l.google.com:19302"]},
+            {"urls": ["stun:stun2.l.google.com:19302"]},
+            {"urls": ["stun:stun3.l.google.com:19302"]},
+            {"urls": ["stun:stun4.l.google.com:19302"]}
+        ]
+    },
     media_stream_constraints={
         "video": True,
         "audio": False,
