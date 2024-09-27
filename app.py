@@ -2,27 +2,38 @@ import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, ClientSettings
 
 
-WEBRTC_CLIENT_SETTINGS = ClientSettings(
-    rtc_configuration={"iceServers": [
-            {"urls": ["stun:stun.l.google.com:19302"]},
-            {"urls": ["stun:stun1.l.google.com:19302"]},
-            {"urls": ["stun:stun2.l.google.com:19302"]},
-            {"urls": ["stun:stun3.l.google.com:19302"]},
-            {"urls": ["stun:stun4.l.google.com:19302"]}
-        ]
-    },
-    media_stream_constraints={
-        "video": True,
-        "audio": False,
-    },
-)
+
+rtc_configuration = {
+    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+}
+
+media_stream_constraints = {
+    "video": True,
+    "audio": False,
+}
+
+# WEBRTC_CLIENT_SETTINGS = ClientSettings(
+#     rtc_configuration={"iceServers": [
+#             {"urls": ["stun:stun.l.google.com:19302"]},
+#             {"urls": ["stun:stun1.l.google.com:19302"]},
+#             {"urls": ["stun:stun2.l.google.com:19302"]},
+#             {"urls": ["stun:stun3.l.google.com:19302"]},
+#             {"urls": ["stun:stun4.l.google.com:19302"]}
+#         ]
+#     },
+#     media_stream_constraints={
+#         "video": True,
+#         "audio": False,
+#     },
+# )
 
 class VideoProcessor(VideoProcessorBase):
     def recv(self, frame):
         return frame
 
 st.title("WebRTC Test")
-webrtc_streamer(key="example", client_settings=WEBRTC_CLIENT_SETTINGS, video_processor_factory=VideoProcessor,async_processing=True)
+webrtc_streamer(key="example", rtc_configuration=rtc_configuration, media_stream_constraints=media_stream_constraints,
+                video_processor_factory=VideoProcessor,async_processing=True)
 
 # import streamlit as st
 # from streamlit_webrtc import webrtc_streamer,VideoProcessorBase,ClientSettings,WebRtcMode
