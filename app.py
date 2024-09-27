@@ -35,6 +35,7 @@ st.markdown('NOTE: Use single hand to use ASL gesture')
 run = st.button('Run')
 class VideoProcessor(VideoProcessorBase):
     def recv(self, frame):
+        print("Frame received") #dafasfdf
         img = frame.to_ndarray(format="bgr24")
         data_aux = []
         x_ = []
@@ -85,6 +86,7 @@ class VideoProcessor(VideoProcessorBase):
         return img
 
 if run:
+    time.sleep(1) # adding delay
     webrtc_streamer(key="example",mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_processor_factory=VideoProcessor)
 
 # FRAME_WINDOW = st.image([])
