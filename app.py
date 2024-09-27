@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer,VideoProcessorBase,ClientSettings
+from streamlit_webrtc import webrtc_streamer,VideoProcessorBase,ClientSettings,WebRtcMode
 import pickle
 import cv2
 import mediapipe as mp
@@ -85,7 +85,7 @@ class VideoProcessor(VideoProcessorBase):
         return img
 
 if run:
-    webrtc_streamer(key="example", client_settings=WEBRTC_CLIENT_SETTINGS, video_processor_factory=VideoProcessor)
+    webrtc_streamer(key="example",mode=WebRtcMode.SENDRECV, client_settings=WEBRTC_CLIENT_SETTINGS, video_processor_factory=VideoProcessor)
 
 # FRAME_WINDOW = st.image([])
 
